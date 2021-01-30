@@ -8,7 +8,7 @@ This repository holds all of my personal projects that I've done over the years.
      - R
         - Data Science
         - Learning projects
-        - General curiosity 
+        - Software Development 
   2. Public Tableau Vizualizations
   
   Each category has their own variety of projects and should be accompanied by some form of documentation.
