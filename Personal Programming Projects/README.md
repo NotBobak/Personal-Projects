@@ -1,27 +1,20 @@
-# A Look Back at the Last 11 years of Dragonboat Racing in Canada
+# Programming Projects
 
-Exploratory data analysis of Mofos' dragonboat race data. Dragon Boat is a rapidly growing, competitive team sport consisting of 20 paddlers in a boat. Most common distances are 200m and 500m. All data retrieved from http://www.mofosdragonboat.com/Rankings/RankingsIndex.php .
----
+### About Me
+I was introduced to programming in my junior year of Highschool. I learned how to use Python to simulate fractals and write reports in jupyter notebook. In university I furthur developed my programming ablilities through various courses projects and gained an appreciation for R. From here I began using my programming skills for Data Analaysis during my time as a statistics student.
 
-**Version 1.0.0**
+I've grown to enjoy programming over the years and have tried out data analysis projects, software development projects and web development projects. This repository holds all of my personal projects that I've done as a programmer. Currently categorized by programming language and sub-categorized by project type.
 
----
-
-## Contributors 
-
-- Bobak Ahmar <bobak.ahmar.dev@gmail.com>
-
----
-
-## License & copyright
-
-© Bobak Ahmar, RANKINGS@MOFOSDRAGONBOAT.COM 
-
----
-
-## Acknowledgments
-
-The Canadian Dragon Boat Rankings (CDBR) team for creating the ranking system and providing up-to-date information. 
+##Index
+ 1. Python
+    - Data Science
+    - Learning Projects
+    - Software Development
+   
+ 1. R
+    - Data Science
+    - Learning Projects
+    - Software Development
 
 ## Contact me
 | *Contact Method*   |                              |
