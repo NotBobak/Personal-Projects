@@ -5,10 +5,15 @@
 This repository holds all of my personal projects that I've done over the years. Currently they're binned into the following categories:
   
   1. Personal Programming Projects
-     - R
+     - Python
         - Data Science
         - Learning projects
         - Software Development 
+     - R
+        - Data Science
+        - Learning projects
+        - Software Development         
+        
   2. Public Tableau Vizualizations
   
   Each category has their own variety of projects and should be accompanied by some form of documentation.
