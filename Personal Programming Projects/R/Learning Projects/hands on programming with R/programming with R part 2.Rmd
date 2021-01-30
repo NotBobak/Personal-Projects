@@ -1,0 +1,837 @@
+---
+title: "programing with R part 2"
+output: html_notebook
+---
+
+5.1 Atomic Vectors
+Each atomic vector stores its values as a one-dimensional vector, and each atomic vector can only store one type of data.
+```{r}
+die <- c(1,2,3,4,5,6)
+die
+is.vector(die)
+length(die)
+
+five <- 5
+five
+is.vector(five)
+length(five)
+```
+
+R recognizes six basic types of atomic vectors: doubles, integers, characters, logicals, complex, and raw.
+```{r}
+int <- 1L
+text <- "ace"
+
+int <- c(1L, 5L)
+text <- c("ace", "hearts")
+
+sum(int)
+## 6
+
+#sum(text) <- error cant sum characters
+```
+
+5.1.1 Doubles
+A double vector stores regular numbers. The numbers can be positive or negative, large or small, and have digits to the right of the decimal place or not. In general, R will save any number that you type in R as a double.
+```{r}
+die <- c(1, 2, 3, 4, 5, 6)
+die
+
+typeof(die)
+```
+
+5.1.2 Integers
+You can specifically create an integer in R by typing a number followed by an uppercase L
+```{r}
+int <- c(-1L, 2L, 4L)
+int
+
+typeof(int)
+
+#each double is accurate to about 16 significant digits
+sqrt(2)^2 - 2
+
+```
+
+5.1.3 Characters
+A character vector stores small pieces of text.
+```{r}
+text <- c("Hello",  "World")
+text
+typeof(text)
+typeof("Hello")
+
+```
+
+5.1.4 Logicals
+Logical vectors store TRUEs and FALSEs, R’s form of Boolean data.
+R also assumes that T and F are shorthand for TRUE and FALSE, unless they are defined elsewhere
+```{r}
+3 > 4
+
+logic <- c(TRUE, FALSE, TRUE)
+logic
+typeof(logic)
+typeof(F)
+
+```
+
+5.1.5 Complex and Raw
+Complex vectors store complex numbers. To create a complex vector, add an imaginary term to a number with i
+```{r}
+comp <- c(1 + 1i, 1 + 2i, 1 + 3i)
+comp
+typeof(comp)
+```
+Raw vectors store raw bytes of data. Making raw vectors gets complicated, but you can make an empty raw vector of length n with raw(n)
+```{r}
+yeeeeet <- raw(3)
+typeof(yeeeeet)
+```
+
+5.2 Attributes
+An attribute is a piece of information that you can attach to an atomic vector (or any R object).
+```{r}
+attributes(die)
+```
+
+5.2.1 Names
+The most common attributes to give an atomic vector are names, dimensions (dim), and classes.
+```{r}
+names(die)
+names(die) <- c("one", "two", "three", "four", "five", "six")
+names(die)
+attributes(die)
+
+die
+
+names(die) <- c("uno", "dos", "tres", "quatro", "cinco", "seis")
+die
+names(die) <- NULL
+die
+```
+
+5.2.2 Dim 
+You can transform an atomic vector into an n-dimensional array by giving it a dimensions attribute with dim
+R will always use the first value in dim for the number of rows and the second value for the number of columns. 
+```{r}
+dim(die) <- c(2, 3)
+die
+
+dim(die) <- c(3, 2)
+die
+
+dim(die) <- c(1, 2, 3)
+die
+```
+
+5.3 Matrices
+Matrices store values in a two-dimensional array, just like a matrix from linear algebra.
+```{r}
+m <- matrix(die, nrow = 2)
+m
+
+m <- matrix(die, nrow = 2, byrow = TRUE)
+m
+```
+
+5.4 Arrays
+The array function creates an n-dimensional array.
+```{r}
+ar <- array(c(11:14, 21:24, 31:34), dim = c(2, 2, 3))
+ar
+```
+
+Exercise:
+```{r}
+hand1 <- c("ace", "king", "queen", "jack", "ten", "spades", "spades", 
+  "spades", "spades", "spades")
+
+matrix(hand1, nrow = 5)
+matrix(hand1, ncol = 2)
+dim(hand1) <- c(5, 2)
+
+
+hand2 <- c("ace", "spades", "king", "spades", "queen", "spades", "jack", 
+  "spades", "ten", "spades")
+
+matrix(hand2, nrow = 5, byrow = TRUE)
+matrix(hand2, ncol = 2, byrow = TRUE)
+
+```
+
+5.5 Class
+Notice that changing the dimensions of your object will not change the type of the object, but it will change the object’s class attribute:
+
+```{r}
+dim(die) <- c(2, 3)
+typeof(die)
+
+class(die)
+
+attributes(die)
+```
+
+You can apply class to objects that do not have a class attribute. class will return a value based on the object’s atomic type.
+```{r}
+class("Hello")
+class(5)
+
+```
+
+5.5.1 Dates and Times
+The time looks like a character string when you display it, but its data type is actually "double", and its class is "POSIXct" "POSIXt" (it has two classes):
+
+POSIXct is a widely used framework for representing dates and times. In the POSIXct framework, each time is represented by the number of seconds that have passed between the time and 12:00 AM January 1st 1970 (in the Universal Time Coordinated (UTC) zone). For example, the time above occurs 1,395,057,600 seconds after then. So in the POSIXct system, the time would be saved as 1395057600.
+
+```{r}
+now <- Sys.time()
+now
+typeof(now)
+class(now)
+unclass(now)
+
+```
+For example, have you ever wondered what day it was a million seconds after 12:00 a.m. Jan. 1, 1970?
+```{r}
+mil <- 1000000
+mil
+class(mil) <- c("POSIXct", "POSIXt")
+mil
+
+```
+
+5.5.2 Factors
+Factors are R’s way of storing categorical information, like ethnicity or eye color.
+To make a factor, pass an atomic vector into the factor function.
+```{r}
+gender <- factor(c("male", "female", "female", "male"))
+typeof(gender)
+attributes(gender)
+
+unclass(gender)
+gender
+as.character(gender)
+
+```
+
+Exercise 5.4:write a card
+```{r}
+card <- c("ace", "hearts", 1)
+card
+```
+
+5.6 Coercion
+If a character string is present in an atomic vector, R will convert everything else in the vector to character strings. If a vector only contains logicals and numbers, R will convert the logicals to numbers; every TRUE becomes a 1, and every FALSE becomes a 0
+```{r}
+sum(c(TRUE, TRUE, FALSE, FALSE))
+sum(c(1, 1, 0, 0))
+
+as.character(1)
+as.logical(1)
+as.numeric(FALSE)
+
+```
+
+5.7 Lists
+Lists are like atomic vectors because they group data into a one-dimensional set. However, lists do not group together individual values; lists group together R objects, such as atomic vectors and other lists
+```{r}
+list1 <- list(100:130, "R", list(TRUE, FALSE))
+list1
+```
+
+Exercise 5.5 (Use a List to Make a Card)
+```{r}
+card <- list("ace", "hearts", 1)
+card
+```
+
+5.8 Data Frames
+Data frames are the two-dimensional version of a list.
+```{r}
+df <- data.frame(face = c("ace", "two", "six"),  
+  suit = c("clubs", "clubs", "clubs"), value = c(1, 2, 3))
+df
+
+typeof(df)
+class(df)
+str(df)
+```
+
+5.9 Loading Data
+
+```{r}
+head(deck)
+```
+
+5.10 Saving Data
+```{r}
+write.csv(deck, file = "cards.csv", row.names = FALSE)
+
+```
+
+6.R Notation
+
+6.1.1 Positive Integers
+R treats positive integers just like ij notation in linear algebra: deck[i,j] will return the value of deck that is in the ith row and the jth column
+```{r}
+head(deck)
+deck[1,1]
+```
+To extract more than one value, use a vector of positive integers. For example, you can return the first row of deck with deck[1, c(1, 2, 3)] or deck[1, 1:3]
+```{r}
+deck[1,c(1,2,3)]; deck[1,1:3]
+new <- deck[1,c(1,2,3)]
+
+#R indexing begins at 1 not 0
+vec <- c(6, 1, 3, 6, 10, 5)
+vec[1:3]
+```
+
+6.1.2 Negative Integers
+Negative integers do the exact opposite of positive integers when indexing. R will return every element except the elements in a negative index.
+```{r}
+deck[-(2:52), 1:3]
+```
+
+6.1.3 Zero
+R will return nothing from a dimension when you use zero as an index. This creates an empty object
+```{r}
+deck[0, 0]
+## data frame with 0 columns and 0 rows
+```
+
+6.1.4 Blank Spaces
+You can use a blank space to tell R to extract every value in a dimension
+```{r}
+deck[1, ]
+```
+
+6.1.5 Logical Values
+If you supply a vector of TRUEs and FALSEs as your index, R will match each TRUE and FALSE to a row in your data frame (or a column depending on where you place the index). R will then return each row that corresponds to a TRUE
+```{r}
+deck[1, c(TRUE, TRUE, FALSE)]
+rows <- c(TRUE, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, 
+  F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,   F, F, F, F, F, F, F, F, F, F, F, F, F, F)
+deck[rows, ]
+```
+
+6.1.6 Names
+Finally, you can ask for the elements you want by name—if your object has names 
+```{r}
+deck[1, c("face", "suit", "value")]
+
+# the entire value column
+deck[ , "value"]
+```
+
+
+6.2 Deal a Card
+
+Exercise 6.1 (deal a card)Complete the following code to make a function that returns the first row of a data frame:
+```{r}
+deal <- function(cards) {
+   cards[1,]
+}
+
+deal(deck)
+```
+
+6.3 Shuffle the Deck
+start by extracting every row in your data frame:
+```{r}
+deck2 <- deck[1:52, ]
+
+head(deck2)
+```
+use sample to get random cards
+```{r}
+random <- sample(1:52, size = 52)
+random
+
+deck4 <- deck[random, ]
+head(deck4)
+```
+Now the new set is truly shuffled. You’ll be finished once you wrap these steps into a function.
+
+Exercise 6.2 (shuffle a deck) Use the preceding ideas to write a shuffle function. shuffle should take a data frame and return a shuffled copy of the data frame.
+```{r}
+shuffle <- function(df) {
+  random <- sample(1:52, size = 52)
+  df[random,]
+}
+```
+now it works
+```{r}
+deal(deck)
+deck2 <- shuffle(deck)
+deal(deck2)
+```
+
+
+6.4 Dollar Signs and Double Brackets
+To select a column from a data frame, write the data frame’s name and the column name separated by a $
+```{r}
+deck$value
+
+mean(deck$value)
+median(deck$value)
+
+```
+names in a list
+```{r}
+lst <- list(numbers = c(1, 2), logical = TRUE, strings = c("a", "b", "c"))
+lst
+
+```
+subset it
+```{r}
+lst[1]
+
+lst[[1]]
+lst$numbers
+
+sum(lst$numbers)
+```
+
+```{r}
+lst["numbers"]
+lst[["numbers"]]
+```
+list train analogy
+
+
+7. Modifying Values
+
+```{r}
+deck2 <- deck
+```
+
+7.0.1 Changing Values in Place
+```{r}
+vec <- c(0, 0, 0, 0, 0, 0)
+vec
+
+vec[1]
+
+vec[1] <- 1000
+vec
+
+vec[c(1, 3, 5)] <- c(1, 1, 1)
+vec
+
+vec[4:6] <- vec[4:6] + 1
+vec
+
+vec[7] <- 0
+vec
+```
+
+```{r}
+deck2$new <- 1:52
+
+head(deck2)
+
+deck2$new <- NULL
+
+head(deck2)
+```
+Give aces new values
+```{r}
+deck2[c(13, 26, 39, 52), ]
+
+deck2[c(13, 26, 39, 52), 3]
+deck2$value[c(13, 26, 39, 52)]
+
+deck2$value[c(13, 26, 39, 52)] <- c(14, 14, 14, 14)
+deck2$value[c(13, 26, 39, 52)] <- 14
+
+head(deck2, 13)
+
+```
+
+```{r}
+deck3 <- shuffle(deck)
+head(deck3)
+```
+7.0.2 Logical Subsetting
+```{r}
+vec
+vec[c(FALSE, FALSE, FALSE, FALSE, TRUE, FALSE, FALSE)]
+
+```
+
+7.0.2.1 Logical Tests
+A logical test is a comparison like “is one less than two?”, 1 < 2, or “is three greater than four?”, 3 > 4
+```{r}
+1 > 2
+
+1 > c(0, 1, 2)
+
+c(1, 2, 3) == c(3, 2, 1)
+```
+%in% is the only operator that does not do normal element-wise execution. %in% tests whether the value(s) on the left side are in the vector on the right side. If you provide a vector on the left side, %in% will not pair up the values on the left with the values on the right and then do element-wise tests. Instead, %in% will independently test whether each value on the left is somewhere in the vector on the right:
+```{r}
+1 %in% c(3, 4, 5)
+
+c(1, 2) %in% c(3, 4, 5)
+
+c(1, 2, 3) %in% c(3, 4, 5)
+
+c(1, 2, 3, 4) %in% c(3, 4, 5)
+```
+
+Exercise 7.1 (How many Aces?) Extract the face column of deck2 and test whether each value is equal to ace. As a challenge, use R to quickly count how many cards are equal to ace.
+```{r}
+deck2$face
+
+deck2$face == "ace"
+
+sum(deck2$face == "ace")
+```
+
+```{r}
+deck3$face == "ace"
+deck3$value[deck3$face == "ace"]
+
+deck3$value[deck3$face == "ace"] <- 14
+
+head(deck3)
+
+```
+
+Logical Subsetting in hearts
+```{r}
+deck4 <- deck
+deck4$value <- 0
+
+head(deck4, 13)
+```
+
+Exercise 7.2 (Score the Deck for Hearts) Assign a value of 1 to every card in deck4 that has a suit of hearts.
+```{r}
+deck4$suit == "hearts"
+deck4$value[deck4$suit == "hearts"]
+deck4$value[deck4$suit == "hearts"] <- 1
+deck4$value[deck4$suit == "hearts"]
+```
+
+7.0.2.2 Boolean Operators
+Boolean operators are things like and (&) and or (|). They collapse the results of multiple logical tests into a single TRUE or FALSE. R has six boolean operators
+```{r}
+a <- c(1, 2, 3)
+b <- c(1, 2, 3)
+c <- c(1, 2, 4)
+
+a == b
+
+b == c
+
+a == b & b == c
+```
+
+You want to test each card to see if it is both a queen and a spade
+```{r}
+deck4$face == "queen" & deck4$suit == "spades"
+queenOfSpades <- deck4$face == "queen" & deck4$suit == "spades"
+
+#index
+deck4[queenOfSpades, ]
+deck4$value[queenOfSpades]
+
+#update
+deck4$value[queenOfSpades] <- 13
+
+deck4[queenOfSpades, ]
+```
+
+Exercise 7.3 (Practice with Tests) If you think you have the hang of logical tests, try converting these sentences into tests written with R code. To help you out, I’ve defined some R objects after the sentences that you can use to test your answers:
+
+Is w positive?
+Is x greater than 10 and less than 20?
+Is object y the word February?
+Is every value in z a day of the week?
+
+```{r}
+w <- c(-1, 0, 1)
+x <- c(5, 15)
+y <- "February"
+z <- c("Monday", "Tuesday", "Friday")
+
+w > 0
+x > 10 & x < 20
+y == "February"
+all(z %in% c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", 
+  "Saturday", "Sunday"))
+```
+
+BlackJack
+```{r}
+deck5 <- deck
+
+head(deck5, 13)
+
+#Change face cards
+facecard <- deck5$face %in% c("king", "queen", "jack")
+
+deck5[facecard, ]
+
+deck5$value[facecard] <- 10
+
+head(deck5, 13)
+```
+
+7.0.3 Missing Information
+The NA character is a special symbol in R. It stands for “not available” and can be used as a placeholder for missing information. R will treat NA exactly as you should want missing information treated.
+```{r}
+1 + NA
+NA == 1
+```
+
+7.0.3.1 na.rm
+Most R functions come with the optional argument, na.rm, which stands for NA remove. R will ignore NAs when it evaluates a function if you add the argument na.rm = TRUE:
+```{r}
+c(NA, 1:50)
+mean(c(NA, 1:50))
+
+mean(c(NA, 1:50), na.rm = TRUE)
+```
+
+7.0.3.2 is.na
+R supplies a special function that can test whether a value is an NA. The function is sensibly named is.na:
+```{r}
+NA == NA
+c(1, 2, 3, NA) == NA
+
+is.na(NA)
+vec <- c(1, 2, 3, NA)
+is.na(vec)
+```
+Set ace values to NA
+```{r}
+deck5$value[deck5$face == "ace"] <- NA
+
+head(deck5, 13)
+```
+
+8 Environments
+```{r}
+library(pryr)
+parenvs(all = TRUE)
+```
+
+8.2 Working with Environments
+you can refer to any of the environments in your tree with as.environment. as.environment takes an environment name (as a character string) and returns the corresponding environment:
+```{r}
+as.environment("package:stats")
+
+globalenv()
+
+baseenv()
+
+emptyenv()
+
+parent.env(globalenv())
+parent.env(emptyenv())
+
+```
+
+```{r}
+ls(emptyenv())
+
+ls(globalenv())
+```
+And you can use the assign function to save an object into a particular environment. First give assign the name of the new object (as a character string). Then give assign the value of the new object, and finally the environment to save the object in:
+```{r}
+head(globalenv()$deck, 3)
+
+assign("new", "Hello Global", envir = globalenv())
+
+globalenv()$new
+```
+
+8.2.1 The Active Environment
+You can use environment to see the current active environment:
+```{r}
+environment()
+
+```
+
+8.3 Scoping Rules
+R follows a special set of rules to look up objects. These rules are known as R’s scoping rules, and you’ve already met a couple of them:
+
+R looks for objects in the current active environment.
+When you work at the command line, the active environment is the global environment. Hence, R looks up objects that you call at the command line in the global environment.
+Here is a third rule that explains how R finds objects that are not in the active environment
+
+When R does not find an object in an environment, R looks in the environment’s parent environment, then the parent of the parent, and so on, until R finds the object or reaches the empty environment.
+```{r}
+new <- "hello global"
+```
+
+
+8.4 Assignment
+When you assign a value to an object, R saves the value in the active environment under the object’s name. If an object with the same name already exists in the active environment, R will overwrite it.
+
+```{r}
+new
+new <- "hello active"
+new
+```
+Every time R runs a function, it creates a new active environment to evaluate the function in.
+
+8.5 Evaluation
+The results of show_env will tell us the name of the runtime environment, its parent, and which objects the runtime environment contains:
+```{r}
+show_env <- function(){
+  list(ran.in = environment(), 
+    parent = parent.env(environment()), 
+    objects = ls.str(environment()))
+}
+show_env()
+```
+R creates a new environment each time you run a function.
+
+```{r}
+environment(show_env)
+environment(parenvs)
+
+```
+
+This time when we run show_env, R stores a, b, and c in the runtime environment:
+```{r}
+show_env <- function(){
+  a <- 1
+  b <- 2
+  c <- 3
+  list(ran.in = environment(), 
+    parent = parent.env(environment()), 
+    objects = ls.str(environment()))
+}
+show_env()
+```
+
+```{r}
+foo <- "take me to your runtime"
+
+show_env <- function(x = foo){
+  list(ran.in = environment(), 
+    parent = parent.env(environment()), 
+    objects = ls.str(environment()))
+}
+
+show_env()
+```
+
+Exercise 8.1 (Will deal work?) Will R be able to find deck and return an answer when I call the new version of deal, such as deal()?
+```{r}
+deal <- function() {
+  deck[1, ]
+}
+
+environment()
+deal()
+```
+
+fixing deal: remove top card
+```{r}
+DECK <- deck
+
+deck <- deck[-1, ]
+
+head(deck, 3)
+
+```
+
+Exercise 8.2 (Overwrite deck) Rewrite the deck <- deck[-1, ] line of deal to assign deck[-1, ] to an object named deck in the global environment. Hint: consider the assign function.
+```{r}
+deal <- function() {
+  card <- deck[1, ]
+  assign("deck", deck[-1, ], envir = globalenv())
+  card
+}
+deal()
+deal()
+deal()
+```
+
+Exercise 8.3 (Rewrite shuffle) Rewrite shuffle so that it replaces the copy of deck that lives in the global environment with a shuffled version of DECK, the intact copy of deck that also lives in the global environment. The new version of shuffle should have no arguments and return no output.
+```{r}
+shuffle <- function(){
+  random <- sample(1:52, size = 52)
+  assign("deck", DECK[random, ], envir = globalenv())
+}
+shuffle()
+deal()
+deal()
+```
+
+save deck in its own environment
+```{r}
+setup <- function(deck) {
+  DECK <- deck
+
+  DEAL <- function() {
+    card <- deck[1, ]
+    assign("deck", deck[-1, ], envir = globalenv())
+    card
+  }
+
+  SHUFFLE <- function(){
+    random <- sample(1:52, size = 52)
+    assign("deck", DECK[random, ], envir = globalenv())
+ }
+
+ list(deal = DEAL, shuffle = SHUFFLE)
+}
+
+cards <- setup(deck)
+
+deal <- cards$deal
+shuffle <- cards$shuffle
+```
+
+funcs no longer in global environment
+```{r}
+deal 
+shuffle
+
+environment(deal)
+
+environment(shuffle)
+```
+This arrangement is called a closure. setup’s runtime environment “encloses” the deal and shuffle functions. Both deal and shuffle can work closely with the objects contained in the enclosing environment, but almost nothing else can. The enclosing environment is not on the search path for any other R function or environment.
+
+```{r}
+setup <- function(deck) {
+  DECK <- deck
+
+  DEAL <- function() {
+    card <- deck[1, ]
+    assign("deck", deck[-1, ], envir = parent.env(environment()))
+    card
+  }
+
+  SHUFFLE <- function(){
+    random <- sample(1:52, size = 52)
+    assign("deck", DECK[random, ], envir = parent.env(environment()))
+ }
+
+ list(deal = DEAL, shuffle = SHUFFLE)
+}
+
+cards <- setup(deck)
+deal <- cards$deal
+shuffle <- cards$shuffle
+```
+
+```{r}
+rm(deck)
+
+shuffle()
+
+deal()
+
+deal()
+```
+
