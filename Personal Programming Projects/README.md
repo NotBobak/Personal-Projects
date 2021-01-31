@@ -5,7 +5,7 @@ I was introduced to programming in my junior year of Highschool. I learned how t
 
 I've grown to enjoy programming over the years and have tried out data analysis projects, software development projects and web development projects. This repository holds all of my personal projects that I've done as a programmer. Currently categorized by programming language and sub-categorized by project type.
 
-##Index
+## Index
  1. Python
     - Data Science
     - Learning Projects
