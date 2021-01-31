@@ -1,0 +1,109 @@
+---
+title: "STAC32 - Final Project 1002318912"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+#Question:
+
+What affects the tip that a restaurant server receives? The owner of a
+bistro called First Crush in Potsdam, New York, collected a representative
+sample of 157 bills at the bistro over a two-week period. He recorded: the
+total amount of the bill, the amount of the tip, whether or not the bill was
+paid with a credit card (vs. being paid in cash), the number of guests in
+the party, the day of the week, the server (coded as A, B or C), and the
+size of the tip as a percentage of the total bill.
+
+Investigate whether there is any relationship between any of these variables, most of which are factors, and the size of the tip, measured in what
+you think is an appropriate way. What seem to be the most important of
+these variables in determining how big a tip will be left?
+
+```{r}
+library(tidyverse)
+library(broom)
+library(MASS)
+```
+
+Data set 7: Restaurant Tips
+#######################  Read in and display the data  ###########################
+n = 157, 7 variables
+```{r}
+My_url <- "https://www.utsc.utoronto.ca/~butler/c32/restaurant-tips.txt"
+Tips <- read.table(My_url, header = TRUE)
+Tips
+```
+
+################################  Initial look at plots  ################################
+Plot Tips alone
+```{r}
+ggplot(Tips, aes(x = PctTip)) + geom_histogram(bins = 15)
+```
+#Heavily right skewed, clearly not normally distributed
+
+#We want to see the relationship between size of tip (Percent Tip) and the other factors (bill, credit, day, guests, server, tip) and its all plotted in a scatterplot
+#we see that the PctTip vs. bill is constant while PctTip vs. Tip is slightly positive. The other graphs (2-4) are roughly even. 
+
+```{r}
+Tips %>% 
+  gather(xname, x, c(Bill:Server)) %>% ggplot(aes(x = x, y = PctTip)) + geom_point() + facet_wrap(~xname, scales = "free") -> t
+t
+```
+
+#After we see the skewness and the relationships, we use log transformation because it is highly skewed. This removes the possible influence of outliers 
+
+```{r}
+ggplot(TipsLPT, aes(x = log.PctTip)) + geom_histogram(bins = 15)
+```
+# We see that after log transform, data looks more noraml 
+
+# I then check the log of PctTip with the other factors 
+```{r}
+Tips %>% mutate(log.PctTip = log(PctTip)) -> TipsLPT
+TipsLPT
+TipsLPT %>% 
+  gather(xname, x, c(Bill:Server)) %>% ggplot(aes(x = x, y = log.PctTip)) + geom_point() + facet_wrap(~xname, scales = "free") -> t
+t
+```
+# We dont know which x affects response. We start predicting from everything 
+
+```{r}
+TipsLPT.1 <- lm(log.PctTip ~ Bill + Credit + Day + Guests + Server + Tip, data = TipsLPT)
+summary(TipsLPT.1)
+```
+# we see two significant variables: Bill and tip. This is seen by p-value. Therefore the rest will be removed. 
+```{r}
+TipsLPT.2 <- lm(log.PctTip ~ Bill + Tip, data = TipsLPT)
+summary(TipsLPT.2)
+```
+#They are all still significant 
+
+```{r}
+augment(TipsLPT.2, Tips) %>% 
+  gather(xname, x, c(Bill:Tip)) %>% 
+  ggplot(aes( x = x, y = .resid)) + geom_point() + geom_smooth() + facet_wrap(~xname, scales = "free") -> rvsx
+rvsx
+```
+#residuals should have no trend but the tip has a trendline that goes downwards. I think that the bill has little to no trend present. When using the absolute transformation, it fails to flatten out our results and is not used. 
+
+```{r}
+TipsLPT.3 <- update(TipsLPT.2, . ~ . + I(Tip^2) + Bill)
+summary(TipsLPT.3)
+```
+#we have an r-squared value of 0.81 compared to a previous r-squared value of 0.71. This is a 10% increase from the previous 71% to the current 81% after transformation. 
+
+```{r}
+augment(TipsLPT.3, Tips) %>% 
+  gather(xname, x, c(Bill:Tip)) %>% 
+  ggplot(aes( x = x, y = .resid)) + geom_point() + geom_smooth() + facet_wrap(~xname, scales = "free") -> graph
+graph
+```
+#after using x transform, despite small cluster points, the data seems to be more randomly scattered than the original. therefore these transformation are used. we than merge the graphs to see the fitted vs. residuals
+
+```{r}
+augment(TipsLPT.3, Tips) %>% 
+  gather(xname, x, c(Bill:Tip)) %>% 
+  ggplot(aes( x = x, y = .resid)) + geom_point() + geom_smooth() -> graph1
+graph1
+```
+#after transformation, this plot has almost no pattern and is fairly scattered and random. This confirms our model and we can determine that bill and tip are the two most significant factors. 
