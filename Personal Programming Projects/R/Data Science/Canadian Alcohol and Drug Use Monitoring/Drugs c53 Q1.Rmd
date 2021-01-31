@@ -1,0 +1,248 @@
+---
+title: "C53 CADUMS Final Project"
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+  pdf_document: default
+---
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(gmodels)
+library(mosaic)
+library(gapminder)
+library(reshape2)
+library(caret)
+library(MASS)
+library(dplyr)
+library(broom)
+library(nnet)
+```
+###reading in the data##
+
+```{r}
+CADUMS <- read_csv("Drugs c53.txt")
+
+```
+
+```{r}
+#Making inference with Smoking status, first cigarette, past month alcohol use, Personal income before taxes, Highest level of education, Marital status, overall health, alcohol consumption, first drink,  Drinking pattern ~ 4000 observations to work with 
+CADUMS_subset = CADUMS %>% 
+  filter(!is.na(smk12m) & !is.na(smok2) & smok2 != 999 & smok2!= 998 ) %>%
+  filter(!is.na(alc30d)) %>% 
+  filter(pincome != 98 & !is.na(educat4) & !is.na(marstat3)	& hwb1 != 8 & hwb1 !=9 ) %>%
+  filter(!is.na(alc1) & alc1 != 98 & alc1 != 99 & !is.na(alcstat6 ) & alc3 != 99 & alc3 != 98 ) %>% 
+  select(age,CASEID, smk12m, smok2, alc30d, pincome, educat4, marstat3, hwb1, alc1, alcstat6, alc3)
+  head(CADUMS_subset)
+
+#subset with out individual labels
+CADUMS_subset2 = CADUMS_subset
+
+#give important values names (lowest p-values)
+CADUMS_subset$educat4[CADUMS_subset$educat4 == "1"] <- "less than high school"
+CADUMS_subset$educat4[CADUMS_subset$educat4 == "2"] <- "completed highschool"
+CADUMS_subset$educat4[CADUMS_subset$educat4 == "3"] <- "some post secondary (college/univ)"
+CADUMS_subset$educat4[CADUMS_subset$educat4 == "4"] <- "university degree"
+
+CADUMS_subset$marstat3[CADUMS_subset$marstat3 == "1"] <- "married/living with partner"
+CADUMS_subset$marstat3[CADUMS_subset$marstat3 == "2"] <- "previously married"
+CADUMS_subset$marstat3[CADUMS_subset$marstat3 == "3"] <- "never married"
+
+CADUMS_subset$hwb1[CADUMS_subset$hwb1 == "1"] <- "Excellent"
+CADUMS_subset$hwb1[CADUMS_subset$hwb1 == "2"] <- "Very good"
+CADUMS_subset$hwb1[CADUMS_subset$hwb1 == "3"] <- "Good"
+CADUMS_subset$hwb1[CADUMS_subset$hwb1 == "4"] <- "Fair"
+CADUMS_subset$hwb1[CADUMS_subset$hwb1 == "5"] <- "Poor"
+
+
+CADUMS_subset$alcstat6[CADUMS_subset$alcstat6 == "0"] <- "Lifetime Abstainer"
+CADUMS_subset$alcstat6[CADUMS_subset$alcstat6 == "1"] <- "Former Drinker"
+CADUMS_subset$alcstat6[CADUMS_subset$alcstat6 == "2"] <- "Light/Infrequent"
+CADUMS_subset$alcstat6[CADUMS_subset$alcstat6 == "3"] <- "Light/Frequent"
+CADUMS_subset$alcstat6[CADUMS_subset$alcstat6 == "4"] <- "Heavy/Infrequent"
+CADUMS_subset$alcstat6[CADUMS_subset$alcstat6 == "5"] <- "Heavy/Frequent"
+
+
+```
+####ACTUALL ANALYSIS###
+```{r}
+## Create training set with 70% of subset of full data
+set.seed(1234)
+train_labels <- CADUMS_subset[sample(seq_len(nrow(CADUMS_subset)), size = 0.7*((nrow(CADUMS_subset)))),]
+
+train_no_labels = CADUMS_subset2[sample(seq_len(nrow(CADUMS_subset2)), size = 0.7*((nrow(CADUMS_subset2)))),]
+
+#Fit a logistic regression to predict smoking status and alc with all selected variables
+logit.smokemod <- glm(smk12m ~ age + smok2 + pincome + educat4 + marstat3 + hwb1 + alc1 + alcstat6 + alc3 + alc30d, data = train_no_labels,  family = binomial(logit))
+
+logit.alcmod <- glm(alc30d ~ age + smok2 + pincome + educat4 + marstat3 + hwb1  + alcstat6 + alc3 + smk12m, data = train_no_labels,  family = binomial(logit))
+
+
+
+#fit model with extra labels included to see which variables specifically influence smoker status using odds
+logit.smokemodlabels <- glm(smk12m ~ age + smok2 + pincome + educat4 + marstat3 + hwb1 + alc1 + alcstat6 + alc3 +alc30d, data = train_labels,  family = binomial(logit))
+
+logit.alcmodlabels <- glm(alc30d ~ age + smok2 + pincome + educat4 + marstat3 + hwb1 + alcstat6 + alc3 + smk12m, data = train_labels,  family = binomial(logit))
+
+#Refit with only sig variables
+logit.smokemodlabels2 <- glm(smk12m ~ age + smok2 + pincome + educat4 + marstat3 + hwb1 + alcstat6 , data = train_labels,  family = binomial(logit))
+summary(logit.smokemodlabels2)
+
+logit.alcmodlabels2 <- glm(alc30d ~ pincome + educat4 , data = train_labels,  family = binomial(logit))
+summary(logit.alcmodlabels2)
+
+logit.smokemod2 <- glm(smk12m ~ age + smok2 + pincome + educat4 + marstat3 + hwb1 + alcstat6 , data = train_no_labels,  family = binomial(logit))
+summary(logit.smokemodlabels2)
+
+logit.alcmod2 <- glm(alc30d ~ pincome + educat4 , data = train_no_labels,  family = binomial(logit))
+summary(logit.alcmodlabels2)
+
+#summary of models
+#summary(logit.smokemod)
+#summary(logit.alcmod)
+
+summary(logit.smokemodlabels)
+summary(logit.alcmodlabels)
+
+#Check for multicollinearity
+car::vif(logit.smokemod)
+car::vif(logit.alcmod)
+```
+From the smoking outputs we can see that there are many significant variables. Age, age of first cigarette, personal income, one category of education (university graduate), marital status of never married(also previously married), all health variables, everyday drinking, heavy/frequent drinking, and age of starting to drink has significant effect according to the p-values. 
+
+To interpret, the odds of being a smoker in people with highest degree of university graduation is exp(-0.480650) times of the odds of being smoker in people with highest education of completed highschool only, controlling for all the other covariates. This means that university graduates have lower odds of being a smoker compared to the people with completed only highschool education.
+
+The odds of being a smoker in people who have been never married is exp(0.569916) times of the odds of being smoker than people who are married controlling for all the other covariates. This means that unmarried people have higher odds of being a smoker compared to married couples. Similarly with people who were previously married (exp(0.543104) times that of married).
+
+The odds of being a smoker in people who say they have poor, fair, good, and very good health is exp(0.911293), exp(0.568950), exp(0.709801),exp(0.355066) times of the odds of being smoker than people who say they have excellent health controlling for all the other covariates. This means that people who are more healthy generally seem more healthy according to the log odds.
+
+
+The odds of being a smoker in people who drink heavily/frequently is exp(0.924297) times of the odds of being smoker than people whonever drink less frequently or not at all controlling for all the other covariates. This means more frequent drinkers have higher odds of being a smoker compared to those who drink less or not at all. This generally makes sense if those with worse overall health decide to smoke. 
+
+Age of first cigarette, age, and personal income seem to also have a significant effect on smoker status. So we could interpret as the lower the age of first cigarette, the lower your income likely you are to be an active smoker today.
+
+
+
+From the drinking outputs we can see that there are fewer significant variables. Two category of education some post secondary (college/univ) and less than high school and personal income has significant effect according to the p-values. 
+
+To interpret, the odds of being a drinker in people with less than high school education is exp(-0.39193) times of the odds of being a drinker in people with highest education of completed highschool only, controlling for all the other covariates. This means that those with less than highschool education have lower odds of being a drinker compared to the people with completed only highschool education. 
+
+The odds of being a drinker in people with some post secondary (college/univ) is exp(0.42600) times of the odds of being a drinker in people with highest education of completed highschool only, controlling for all the other covariates. This means that those with some post secondary (college/univ) education have higher odds of being a drinker compared to the people with completed only highschool education. 
+
+
+```{r}
+# internal validation using cross-validation
+lrm.smokefinal <- lrm(smk12m ~  age + smok2 + pincome + educat4 + marstat3 + hwb1 + alcstat6,
+                 data=train_no_labels,  x =TRUE, y = TRUE, model= T)
+
+lrm.alcfinal <- lrm(alc30d ~ pincome + educat4, 
+                    data = train_no_labels,  x =TRUE, y = TRUE, model= T)
+
+## Cross validation ##
+cross.smokelogit <- calibrate(lrm.smokefinal, 
+                         method="crossvalidation", B=10) # model calibration
+cross.alclogit <- calibrate(lrm.alcfinal, 
+                         method="crossvalidation", B=10) # model calibration
+
+
+#plot of performance
+plot(cross.smokelogit, las=1, xlab = "Predicted Probability")
+plot(cross.alclogit, las=1, xlab = "Predicted Probability")
+
+```
+From the smoker plot we can see that the bias corrected line somewhat deviates from the expected 45 degree line but for the most part is in line with the ideal. Thus, the model does perform fairly well in predicting the responses for smokers from the training dataset.
+
+From the drinker plot we can see that the bias corrected line deviates quite a bit from the expected 45 degree line and is not very in line with the ideal. Thus, the model does not perform as well in predicting the responses for drinkers from the training dataset. There may be better variables in the data set we could use if we were to study this furthur.
+
+
+```{r}
+### Discrimination with ROC curve ##
+library(pROC)
+psmoke <- predict(lrm.smokefinal, type = "fitted")
+p1smoke <- predict(logit.smokemod, type = "response")
+roc_smokelogit <- roc(train_no_labels$smk12m ~ psmoke)
+
+palc <- predict(lrm.alcfinal, type = "fitted")
+p1alc <- predict(logit.alcmod, type = "response")
+roc_alclogit <- roc(train_no_labels$alc30d ~ palc)
+
+## The True Positive Rate ##
+TPRsmoke <- roc_smokelogit$sensitivities
+
+TPRalc <- roc_alclogit$sensitivities
+
+## The False Positive Rate ##
+FPRsmoke <- 1 - roc_smokelogit$specificities
+
+FPRalc <- 1 - roc_alclogit$specificities
+
+#plot and look at aread under curve (AUC)
+plot(FPRsmoke, TPRsmoke, xlim = c(0,1), ylim = c(0,1), type = 'l', lty = 1, lwd = 2,col = 'red')
+abline(a = 0, b = 1, lty = 2, col = 'blue')
+text(0.7,0.4,label = paste("Smoker AUC = ", round(auc(roc_smokelogit),2)))
+
+plot(FPRalc, TPRalc, xlim = c(0,1), ylim = c(0,1), type = 'l', lty = 1, lwd = 2,col = 'red')
+abline(a = 0, b = 1, lty = 2, col = 'blue')
+text(0.7,0.4,label = paste("Drinker AUC = ", round(auc(roc_alclogit),2)))
+
+
+```
+The smoker area under the curve (AUC) is = 0.72. This means that the model can discriminate between smokers and non-smokers 72% of the times. That is, there is 72% chance that
+model will be able to distinguish between smokers and non-smokers.
+
+The drinker area under the curve (AUC) is = 0.65. This means that the model can discriminate between drinkers and non-drinkers 65% of the times. That is, there is 65% chance that
+model will be able to distinguish between drinkers and non-drinkers which is not very good.
+
+
+```{r}
+#compare observed vs mean predicted probabilities by decile for smoker status
+library(dplyr)
+
+#GEt data not sampled (test data = 25% of original subset)
+test <- CADUMS_subset2[!CADUMS_subset2$CASEID %in% train_no_labels$CASEID,]
+
+#Predict Probabilities
+Predict_smokedata <- data.frame(test, 
+                           Probabilities = predict(logit.smokemod2, test, type = "response"))
+Predict_alcdata <- data.frame(test, 
+                           Probabilities = predict(logit.alcmod2, test, type = "response"))
+
+#Get Deciles 
+Deciles_smoke <- Predict_smokedata %>% mutate(Decile = ntile(Probabilities, 10)) %>% arrange(Probabilities)
+Deciles_alc <- Predict_alcdata %>% mutate(Decile = ntile(Probabilities, 10)) %>% arrange(Probabilities)
+
+#get mean prob per decile
+Mean_deciles_smoke <- Deciles_smoke %>% group_by(Decile) %>% 
+  summarise(Mean_prob_smoke = mean(Probabilities))
+
+Mean_deciles_alc <- Deciles_alc %>% group_by(Decile) %>% 
+  summarise(Mean_prob_alc = mean(Probabilities))
+
+#get observed probabilities of smokers
+ObsDeciles_smoke <- Deciles_smoke %>% group_by(Decile)  %>%  filter(smk12m == 1) %>% count() %>% 
+  summarise(obs_prob_smoke = n/((nrow(Predict_smokedata)/10)) )
+
+ObsDeciles_alc <- Deciles_alc %>% group_by(Decile)  %>%  filter(alc30d == 1) %>% count() %>% 
+  summarise(obs_prob_alc = n/((nrow(Predict_smokedata)/10)) )
+
+#Merge tables
+Together_smoke <- merge(Mean_deciles_smoke, ObsDeciles_smoke, by = "Decile")
+Together_alc <- merge(Mean_deciles_alc, ObsDeciles_alc, by = "Decile")
+
+#Plot observed vs mean predicted probabilities by decile
+ggplot(Together_smoke, aes(x = Mean_prob_smoke, y = obs_prob_smoke)) +
+  geom_point() + geom_abline(intercept = 0, slope = 1)
+
+ggplot(Together_alc, aes(x = Mean_prob_alc, y = obs_prob_alc)) +
+  geom_point() + geom_abline(intercept = 0, slope = 1)
+
+```
+As can be seen from the Alcohol plot, that the observed probabilities differ quite a bit from the mean predicted probabilities for each decile of the predicted probabilities. From decile 3 to 4 decile, 5 to 6, and from decile 7 to 8 the observed probability actually decreased.
+This, shows that this model does not have good predictive power, but the probabilities are somewhat similar (with an upward linear trend).
+
+As can be seen from the smoker plot, that the observed probabilities are quite similar to the mean predicted probabilities for each decile of the predicted probabilities, with similar decreasing decile paterens.  This, shows that this model does not have exact predictive power, but the probabilities are again fairly similar (with an upward linear trend almost a 45 degree line relationship).
+
+
+
+

@@ -1,0 +1,89 @@
+---
+title: "Research question 2"
+output: html_notebook
+---
+```{r}
+library(MASS)
+library(tidyverse)
+library(dplyr)
+library(broom)
+library(nnet)
+```
+
+#Research Question 2: Does age of onsent affect your present time smoking/drinking behaviour?
+This subset of data will consist of individual sex, present time smoking/drinking behaviour, and age of first alcoholic drink/cigarette.
+
+```{r}
+drugs <- read.csv("Drugs c53.txt") #11090
+drugs %>% mutate(sex = factor(sex)) %>% filter(alc1 <97) %>% dplyr::select (sex, alc1, alc3) %>% filter(alc3<97) %>% mutate(alc1 = factor(alc1)) -> alc
+drugs %>% mutate(sex = factor(sex)) %>% dplyr::select (sex, smok2,smok3) %>% filter(smok2 <997) %>% arrange(desc(smok3)) %>% filter(smok3 <3) %>% mutate(smok3 = factor(smok3))->smok
+```
+
+#Predicting likelihood of current smoking based on age of onset
+```{r}
+pref.1 <-multinom(smok3 ~ sex + smok2, data = smok)
+summary(pref.1)
+```
+```{r}
+step(pref.1, trace = 0)
+#AIC > residual deviance, model requires sex and days 
+```
+```{r}
+d = smok$smok2
+quantile(d)
+```
+
+
+```{r}
+smoke <- c(5,14,15,18,54)
+sex <- factor(1:2)
+new <- crossing(smok2 = smoke, sex = sex)
+
+p <- predict(pref.1, new, type = "probs")
+probs <- cbind(new, p)
+
+probs %>%
+  gather(freq, probability, -(smok2:sex)) -> probs.long
+
+
+ggplot(probs.long, aes(x = smok2, y = probability, colour = freq, shape = sex)) +geom_point() + geom_line()
+```
+The following output shows the probability of an individual smoking behaviour based on when they first started smoking. Frequency 0 is non-smoking present behaviour and is seen to increase at around age 20 and decreases as the individual's first smoke increases with age. Additionally, frequency 1 is the present behaviour of smoking daily which seems to decreases as age but the probability of smoking daily appears to be higher when the age of onset is earlier. Lastly, frequency 2 refers to the present behaviour of occassionally smoking which seems to be more likely if an individual starts smoking at a later age. When an individual approaches the age of ~18, we can see that the likelihood of being an occassional smoker increase while the likelihood of being a non-smoker decreases. It is evident that an individual will smoke occasionally at a later age as a result of decreasing non-smoking behaviour and decreasing daily smoking behaviour. This could be a result of individuals being more health conscious at later ages making it more preferable to have a cigarette occasionally than often.
+
+When looking at the differences in sex, we see that in all cases, females (sex 2) are less likely to be a smoke when compared to males. At frequency 0, females are slightly higher than males and at frequency 1 & 2, females appear to be below the male trendline at almost all points in time. Despite this, the difference between male and female does not appear to be large as both males and females could be more conscious towards the dangers of smoking at an older age.
+
+
+#Predicting likelihood of current drinking based on age of onset
+```{r}
+pref.2 <-multinom(alc1 ~ sex + alc3, data = alc)
+summary(pref.2)
+```
+```{r}
+step(pref.2, trace = 0)
+#AIC > residual deviance, model requires sex and days 
+```
+
+```{r}
+d1 = alc$alc3
+quantile(d1)
+```
+
+```{r}
+alcohol <- c(5,16,18,20,81)
+sex <- factor(1:2)
+new <- crossing(alc3 = alcohol, sex = sex)
+
+p1 <- predict(pref.2, new, type = "probs")
+probs1 <- cbind(new, p1)
+
+probs1 %>%
+  gather(freq, probability, -(alc3:sex)) -> probs.long1
+
+
+ggplot(probs.long1, aes(x = alc3, y = probability, colour = freq, shape = sex)) +geom_point() + geom_line() + facet_wrap(~freq)
+```
+This output depicts the frequency of an individual's present day drinking behaviour based on the age of onset. The frequencies are ordered as: Never (0), Less than once a month (1), Once a month (2), 2-3 times a month(3), once a week (4), 2-3 times a week (5), 4-6 times a week (6), and everyday (7). Additionally, males are depictied as sex 1 and females are depicted as sex 2. When looking at frequency 0, the data predicts that as age of onset increases, the likelihood of not drinking increases as well. At frequency 1, there appears to be a slight increase in probability of drinking once a month but diminishes as the individual's onset increases with age. From frequency 3 to frequncy 6, the same effect is seen as the probability of drinking more decreases with a later age of onset. Lastly, in frequency 7, an individual appears to be more likely to drink everyday as the their age increases. The data shows individual are less likely to drink if they had their first alcoholic drink at a later age. The probability decreases as one would expect an individual to become more health conscious at a later age. The only exception is an individual is more likely to drink everyday at a later age and this could be a result of individuals who drank at a later age started to enjoy drinking and could do so more frequently.
+
+When comparing the differences in sexes, we can see that in all frequencies, except frequency 1, females are less likely to drink when compared to males, regardless of age of onset. In frequency 0, the predicted female lines are above the male lines. Furthermore, the female probability lines appear to be lower from frequency 2 to frequncy 7. The only exception present is frequncy 1 where female probability line appears above the male probability lines. The most notable differences between males and females is that females tend to drink less than males at almost all given times. This could be a result of females being more health conscious when they become older as a result of factors such as caregiving and having children. 
+
+
