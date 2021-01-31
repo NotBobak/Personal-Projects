@@ -2,7 +2,7 @@
 
 ## Introduction
 
-R was the second programming language I learned. At first I used it for simulating basic binomial distribution simulations but I quickly transitioned into using R as a data analysis tool thoughout my university career. Since then I've worked on numerous personal projects in different kinds of work. This repository holds some of the work that I have completed.
+R was the second programming language I learned. At first I used it for basic binomial distribution simulations but I quickly transitioned into using R as a data analysis tool thoughout my university career. Since then I've worked on numerous personal projects in different kinds of work. This repository holds some of the work that I have completed.
 
 # Project Examples 
 
