@@ -1,27 +1,9 @@
-# A Look Back at the Last 11 years of Dragonboat Racing in Canada
+# [Hands-On Programming with R](https://rstudio-education.github.io/hopr/)
+This folder includes the 3 projects covered in this book and all the concepts I learned from them.
+ - Project 1: [Weighted Dice](https://github.com/NotBobak/Projects/tree/main/Personal%20Programming%20Projects/R/Learning%20Projects/hands%20on%20programming%20with%20R/Weighted%20Dice)
+ - Project 2: [Playing Cards](https://github.com/NotBobak/Projects/tree/main/Personal%20Programming%20Projects/R/Learning%20Projects/hands%20on%20programming%20with%20R/Playing%20Cards)
+ - Project 3: Slot Machine
 
-Exploratory data analysis of Mofos' dragonboat race data. Dragon Boat is a rapidly growing, competitive team sport consisting of 20 paddlers in a boat. Most common distances are 200m and 500m. All data retrieved from http://www.mofosdragonboat.com/Rankings/RankingsIndex.php .
----
-
-**Version 1.0.0**
-
----
-
-## Contributors 
-
-- Bobak Ahmar <bobak.ahmar.dev@gmail.com>
-
----
-
-## License & copyright
-
-© Bobak Ahmar, RANKINGS@MOFOSDRAGONBOAT.COM 
-
----
-
-## Acknowledgments
-
-The Canadian Dragon Boat Rankings (CDBR) team for creating the ranking system and providing up-to-date information. 
 
 ## Contact me
 | *Contact Method*   |                              |
