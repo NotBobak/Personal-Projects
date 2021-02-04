@@ -10,8 +10,8 @@ This repository holds all of my personal projects that I've done over the years.
         - Learning projects
         - Software Development 
      - R
-        - Data Science
-        - Learning projects
+        - [Data Science](https://github.com/NotBobak/Projects/tree/main/Personal%20Programming%20Projects/R/Data%20Science)
+        - [Learning projects](https://github.com/NotBobak/Projects/tree/main/Personal%20Programming%20Projects/R/Learning%20Projects)
         - Software Development         
         
   2. Public Tableau Vizualizations
