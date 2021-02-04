@@ -1,6 +1,7 @@
 # Project 2: Playing Cards
 This project consists of 4 main tasks based on managing data with R. 
-  Building a deck -> Create a deal & shuffle function -> Change to appropriate point system -> Manage the state of the Deck 
+
+Building a deck -> Create a deal & shuffle function -> Change to appropriate point system -> Manage the state of the Deck 
 
 ## Main Ideas
  - Save new types of data, like character strings and logical values
