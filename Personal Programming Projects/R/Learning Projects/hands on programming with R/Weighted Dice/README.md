@@ -14,6 +14,9 @@ In this project we assemble R code that will simulate rolling a pair of dice. Th
  - The update.packages command checks whether you have the most current version of a package and installs the most current version if you do not
  - To see which packages you currently have in your R library run library()
 
+## Link to [youtube video](https://www.youtube.com/watch?v=MXbCVQeczjQ)
+
+
 ## Contact me
 | *Contact Method*   |                              |
 |--------------------|------------------------------|
