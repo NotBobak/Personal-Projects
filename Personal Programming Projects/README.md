@@ -21,5 +21,5 @@ I've grown to enjoy programming over the years and have tried out data analysis 
 |--------------------|------------------------------|
 | Professional Email | bobak.ahmar.dev@gmail.com    |
 | School Email       | bobak.ahmar@mail.utoronto.ca |
-| Personal Email     | bobak.ahmar@gmail.com        | 
+| LinkedIn           | https://www.linkedin.com/in/bobak-ahmar/| 
   
