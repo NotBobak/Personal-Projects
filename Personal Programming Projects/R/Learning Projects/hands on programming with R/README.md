@@ -10,5 +10,5 @@ This folder includes the 3 projects covered in this book and all the concepts I 
 |--------------------|------------------------------|
 | Professional Email | bobak.ahmar.dev@gmail.com    |
 | School Email       | bobak.ahmar@mail.utoronto.ca |
-| Personal Email     | bobak.ahmar@gmail.com        | 
+| Personal Email     | https://www.linkedin.com/in/bobak-ahmar/  | 
   
