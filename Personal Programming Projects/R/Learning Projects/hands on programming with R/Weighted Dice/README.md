@@ -22,5 +22,5 @@ In this project we assemble R code that will simulate rolling a pair of dice. Th
 |--------------------|------------------------------|
 | Professional Email | bobak.ahmar.dev@gmail.com    |
 | School Email       | bobak.ahmar@mail.utoronto.ca |
-| Personal Email     | bobak.ahmar@gmail.com        | 
+| LinkedIn     | https://www.linkedin.com/in/bobak-ahmar/        | 
   
