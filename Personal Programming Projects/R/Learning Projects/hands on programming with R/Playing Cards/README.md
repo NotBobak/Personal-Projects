@@ -28,5 +28,5 @@ Building a deck -> Create a deal & shuffle function -> Change to appropriate poi
 |--------------------|------------------------------|
 | Professional Email | bobak.ahmar.dev@gmail.com    |
 | School Email       | bobak.ahmar@mail.utoronto.ca |
-| Personal Email     | bobak.ahmar@gmail.com        | 
+| LinkedIn     | https://www.linkedin.com/in/bobak-ahmar/       | 
   
