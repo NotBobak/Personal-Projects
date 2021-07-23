@@ -14,7 +14,7 @@ This repository holds all of my personal projects that I've done over the years.
         - [Learning projects](https://github.com/NotBobak/Projects/tree/main/Personal%20Programming%20Projects/R/Learning%20Projects)
         - Software Development         
         
-  2. Public Tableau Vizualizations
+  2. Tableau Public Vizualizations
   
   Each category has their own variety of projects and should be accompanied by some form of documentation.
 
